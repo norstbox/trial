@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ServiceWorker - Response.body cancellation test</title>    
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then((reg) => {
+                console.log('[MAIN] Registration succeeded. SW Scope is ' + reg.scope);
+            }).catch((error) => {
+                console.log('[MAIN] Registration failed with ' + error);
+            });
+            
+            if (navigator.serviceWorker.controller)
+                doTest()
+            else
+                navigator.serviceWorker.oncontrollerchange = doTest
+        }
+        
+        
+        async function doTest() {
+            console.log(`[MAIN] ${document.title} is started`)
+            const key = '/get-file'
+            let r = await fetch(key)
+            console.log('[MAIN] Trying to cancel stream using ReadableStream.cancel()')
+            try {
+                await r.body.cancel(key)
+                console.log('[MAIN] Stream cancelled succesfully')
+            } catch (e) {
+                console.log('[MAIN] Stream cancelled with error:', e)
+            }
+        }
+    </script>
+  </head>
+  
+  <body>     
+    <h3>Test progress is outputted to console</h3>
+    Related chromium issue: <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=638494" target="_blank">638494</a> - Response.body cancellation should be notified to the service worker.<hr />
+    <a href="https://github.com/norstbox/trial/tree/master/sw-stream-cancellation" target="_blank">View source</a> on GitHub
+  </body>
+</html>
