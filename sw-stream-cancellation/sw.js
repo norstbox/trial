@@ -1,3 +1,9 @@
+const bc = new BroadcastChannel('sw-stream-cancellation')
+console.log('[SW] started')
+console.log = (...msg) => {
+    bc.postMessage({type: 'log', msg})
+}
+
 self.addEventListener('install', event => {
     console.log('[SW] install event fired')
 });
@@ -39,7 +45,7 @@ self.addEventListener('fetch', (event) => {
               }, 2000)
           },
           cancel(reason) {
-              console.log('[SW] Stream cancelled with reason:', reason)
+              console.log('[SW] Stream cancelled with reason:', reason.toString())
               if (reason === url.pathname)
                   initialCancelReason = true                  
               cancelNotification = true

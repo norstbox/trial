@@ -4,6 +4,12 @@
     <meta charset="utf-8">
     <title>ServiceWorker - Response.body cancellation test</title>    
     <script>
+        const bc = new BroadcastChannel('sw-stream-cancellation')
+        bc.onmessage = ({data: {type, msg}}) => {
+            if (type === 'log')
+                console.log(...msg)
+        }
+        
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
             .then((reg) => {
